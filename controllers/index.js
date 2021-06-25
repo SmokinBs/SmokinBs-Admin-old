@@ -1,8 +1,7 @@
 const nodeFetch = require("node-fetch");
-const { foodSchema, alertSchema } = require("../models/foodSchema");
+const { foodSchema, alertSchema, orderSchema } = require("../models/schemas");
 
 let isServerOpen = false;
-
 
 // Locals
 exports.locals = async (req, res, next) => {
@@ -21,6 +20,19 @@ exports.isAuth = async (req, res, next) => {
 		return res.redirect("/sign-in")
 	}
 	next()
+}
+
+
+// Post here to change the status of the website
+exports.businessStatus = async (req, res, next) => {
+	isServerOpen = !isServerOpen
+	nodeFetch("https://smokinbsbbq.tk/open-status")
+	nodeFetch(`https://maker.ifttt.com/trigger/isSmokinOpen/with/key/${process.env.IFTTT}?value1=Business Status Changed&value2=Set status to: ${isServerOpen}`, { method: "POST" })
+
+	res.redirect("/foods-dashboard")
+}
+exports.getBusinessStatus = async (req, res, next) => {
+	res.send(isServerOpen);
 }
 
 
@@ -45,22 +57,17 @@ exports.authSignIn = async (req, res, next) => {
 }
 
 
-// Post here to change the status of the website
-exports.businessStatus = async (req, res, next) => {
-	isServerOpen = !isServerOpen
-	nodeFetch("http://smokinbsbbq.tk/open-status")
-	nodeFetch(`https://maker.ifttt.com/trigger/isSmokinOpen/with/key/${process.env.IFTTT}?value1=Business Status Changed&value2=Set status to: ${isServerOpen}`, { method: "POST" })
-
-	res.redirect("/dashboard")
-}
-
-
-// Admin Dashboard
-exports.renderDashboard = async (req, res, next) => {
+// Admin Dashboards
+exports.renderFoodsDashboard = async (req, res, next) => {
 	foodSchema.find({}, (err, foodItem) => {
 		alertSchema.find({}, (err1, alertItem) => {
-			!err && !err1 ? res.render("dashboard", { food: foodItem, alerts: alertItem }) : console.log(`Error[find]: ${err}`);
+			!err && !err1 ? res.render("foodsDashboard", { food: foodItem, alerts: alertItem }) : console.log(`Error[find]: ${err}`);
 		})
+	})
+}
+exports.renderOrdersDashboard = async (req, res, next) => {
+	orderSchema.find({}, (err, orderItem) => {
+		res.render("ordersDashboard", { orderItem })
 	})
 }
 
@@ -80,10 +87,10 @@ exports.createFood = async (req, res, next) => {
 	await foodItem.save(err => {
 		if (!err) {
 			req.flash("success", "Successfully Created A New Food Item.")
-			return res.redirect("/dashboard")
+			return res.redirect("/foods-dashboard")
 		}
 		req.flash("error", "Error Creating A New Food Item.")
-		return res.redirect("/dashboard")
+		return res.redirect("/foods-dashboard")
 	})
 }
 
@@ -101,10 +108,32 @@ exports.createAlert = async (req, res, next) => {
 	await alertItem.save(err => {
 		if (!err) {
 			req.flash("success", "Successfully Created A New Food Item.")
-			return res.redirect("/dashboard")
+			return res.redirect("/foods-dashboard")
 		}
 		req.flash("error", "Error Creating A New Food Item.")
-		return res.redirect("/dashboard")
+		return res.redirect("/foods-dashboard")
+	})
+}
+
+// Orders
+exports.renderViewOrder = async (req, res, next) => {
+	const order = await orderSchema.findById(req.params.id);
+
+	res.render("viewOrderUpdated", { order })
+}
+// Orders
+exports.updateOrder = async (req, res, next) => {
+	const order = await orderSchema.findByIdAndUpdate(req.params.id, {
+		isOrderOpen: req.body.openOrder === "on" ? true : false
+	});
+
+	await order.save(err => {
+		if (!err) {
+			req.flash("success", "Successfully Updated Order.")
+			return res.redirect("/orders-dashboard")
+		}
+		req.flash("error", "Error Updating Order.")
+		return res.redirect("/orders-dashboard")
 	})
 }
 
@@ -125,10 +154,10 @@ exports.updateFoodItem = async (req, res, next) => {
 	await foodItem.save(err => {
 		if (!err) {
 			req.flash("success", "Successfully Updated A New Food Item.")
-			return res.redirect("/dashboard")
+			return res.redirect("/foods-dashboard")
 		}
 		req.flash("error", "Error Updating A New Food Item.")
-		return res.redirect("/dashboard")
+		return res.redirect("/foods-dashboard")
 	})
 }
 
@@ -147,10 +176,10 @@ exports.updateAlert = async (req, res, next) => {
 	await alertItem.save(err => {
 		if (!err) {
 			req.flash("success", "Successfully Updated An Alert.")
-			return res.redirect("/dashboard")
+			return res.redirect("/foods-dashboard")
 		}
 		req.flash("error", "Error Updating An Alert.")
-		return res.redirect("/dashboard")
+		return res.redirect("/foods-dashboard")
 	})
 }
 
@@ -159,12 +188,12 @@ exports.updateAlert = async (req, res, next) => {
 exports.destroyFood = async (req, res, next) => {
 	await foodSchema.findByIdAndDelete(req.params.id);
 	req.flash("success", "Successfully Deleted A Food Item.")
-	res.redirect("/dashboard");
+	res.redirect("/foods-dashboard");
 }
 exports.destroyAlert = async (req, res, next) => {
 	await alertSchema.findByIdAndDelete(req.params.id);
 	req.flash("success", "Successfully Deleted An Alert.")
-	res.redirect("/dashboard");
+	res.redirect("/foods-dashboard");
 }
 
 

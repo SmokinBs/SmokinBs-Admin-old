@@ -1,0 +1,92 @@
+<%- include("partials/header") %>
+
+<section id="contact" class="contact-section contact-style-1">
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-8">
+
+				<div class="row">
+					<div class="col-xxl-7 col-xl-8 col-lg-10">
+						<div class="section-title mb-40">
+							<h3 class="mb-15">Order for: <%= order.personName %></h3>
+						</div>
+					</div>
+				</div>
+
+				<div class="contact-form-wrapper">
+					<form action="/view-order/<%= order._id %>" method="POST">
+						<div class="row">
+							<div class="col-md-6">
+								<div class="single-input">
+									<label for="name">Name</label>
+									<input type="text" id="name" name="name" class="form-input"
+										value="<%= order.personName %>" disabled>
+									<i class="lni lni-user"></i>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="single-input">
+									<label for="name">Email</label>
+									<input type="text" id="name" name="name" class="form-input"
+										value="<%= order.personEmail %>" disabled>
+									<i class="lni lni-phone"></i>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="single-input">
+									<label for="price">Order Price</label>
+									<input type="text" id="price" name="price" class="form-input"
+										value="$<%= order.totalPrice %>" disabled>
+									<i class="lni lni-money-protection"></i>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="single-input">
+									<label for="openOrder">Is Order Open?</label>
+									<% if (order.isOrderOpen) { %>
+									<input name="openOrder" type="checkbox" checked />
+									<% } else { %>
+									<input name="openOrder" type="checkbox" />
+									<% } %>
+								</div>
+							</div>
+							<div class="col-md-12">
+								<div class="single-input">
+									<label for="description">Order Contents</label>
+									<textarea name="description" id="description" class="form-input" rows="6" disabled>
+									<% order.orderContents.forEach(orderItem => { %>
+									<%- orderItem.name %>
+									<% }) %>
+									</textarea>
+									<i class="lni lni-comments-alt"></i>
+								</div>
+							</div>
+							<div class="col-md-12">
+								<div class="form-button">
+									<button type="submit" class="button radius-10">Update<i
+											class="lni lni-telegram-original"></i> </button>
+									<button type="button" onclick="window.location='/orders-dashboard'"
+										class="button radius-10">Finish<i class="lni lni-close"></i>
+									</button>
+								</div>
+							</div>
+						</div>
+					</form>
+				</div>
+
+			</div>
+		</div>
+	</div>
+
+	<div class="contact-image">
+		<img src="../img/images/illustation.svg" alt="">
+	</div>
+</section>
+
+<%- include("partials/footer") %>
+
+<br />
+
+<p class="orderId">OrderID - <%= order.id %></p>
+
+onclick="updateOrder()"

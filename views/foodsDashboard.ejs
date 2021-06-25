@@ -1,0 +1,91 @@
+<%- include("partials/header") %>
+
+<section id="gallery-4" class="gallery-section gallery-style-4">
+	<div class="container">
+
+		<%- include("partials/message") %>
+
+		<div class="row">
+			<div class="col-xxl-7 col-xl-8 col-lg-10">
+				<div class="section-title mt-40">
+					<h3 class="mb-15">FOOD SECTION</h3>
+					<p>(Hover or Click to see options)<br /><strong>DELETING IS
+							IRREVERSIBLE</strong></p>
+				</div>
+			</div>
+			<div class="col-md-12">
+				<div class="portfolio-button-wrapper">
+					<button class="portfolio-btn active" data-filter="*">All</button>
+					<button class="portfolio-btn" data-filter=".Meats">Meats</button>
+					<button class="portfolio-btn" data-filter=".Sides">Sides</button>
+					<button class="portfolio-btn" data-filter=".Desserts">Desserts</button>
+					<button class="portfolio-btn" data-filter=".Plates">Plates</button>
+					<button class="portfolio-btn" data-filter=".No-Category">No Category</button>
+				</div>
+			</div>
+		</div>
+
+
+		<div class="row grid gallery-4 meats">
+			<% food.forEach(foodItem=> { %>
+			<div class="col-lg-4 col-md-6 gallery-item <%= foodItem.category %>">
+				<div class="single-gallery">
+					<div class="image">
+						<img src="../../../../img/images/logo.png" alt="">
+						<div class="overlay">
+							<div class="action">
+								<a href="/edit-food/<%= foodItem._id %>"> <i class="lni lni-pencil-alt"></i></a>
+								<button id="<%= foodItem._id %>" class="delete lni lni-trash"
+									onclick="deleteFoodClicked(this.id)"></button>
+							</div>
+						</div>
+					</div>
+					<div class="info">
+						<h5><%= foodItem.name %></h5>
+						<p><strong>Price:</strong> $<%= foodItem.price %></p>
+						<p><%= foodItem.shortDescription %> (<%= foodItem.category %>)</p>
+					</div>
+				</div>
+			</div>
+
+			<% }) %>
+		</div>
+
+		<div class="row">
+			<div class="col-xxl-7 col-xl-8 col-lg-10">
+				<div class="section-title mt-40">
+					<h3 class="mb-15">ALERT SECTION</h3>
+				</div>
+			</div>
+			<div class="col-md-12">
+				<div class="portfolio-button-wrapper">
+					<button class="portfolio-btn active" data-filter="*">All Alerts</button>
+				</div>
+			</div>
+		</div>
+
+		<div class="row grid gallery-4 meats">
+			<% alerts.forEach(alertsItem=> { %>
+			<div class="col-lg-4 col-md-6 gallery-item meats">
+				<div class="single-gallery">
+					<div class="image">
+						<img src="../../../img/images/logo.png" alt="">
+						<div class="overlay">
+							<div class="action">
+								<a href="/edit-alert/<%= alertsItem._id %>"> <i class="lni lni-pencil-alt"></i></a>
+								<button id="<%= alertsItem._id %>" class="delete lni lni-trash"
+									onclick="deleteAlertClicked(this.id)"></button>
+							</div>
+						</div>
+					</div>
+					<div class="info">
+						<h5><%= alertsItem.title %></h5>
+						<p><%= alertsItem.content %></p>
+					</div>
+				</div>
+			</div>
+			<% }) %>
+		</div>
+</section>
+
+<%- include("partials/footer") %>

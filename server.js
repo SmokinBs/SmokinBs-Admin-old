@@ -13,6 +13,7 @@ mongoose.connection.on('error', err => { console.log("Error[onErr]: " + err); })
 
 // Middleware
 app.use(require("body-parser").urlencoded({ extended: true }));
+// app.use(require("body-parser").json());
 app.use(express.static("./public"));
 app.set("views", "./views")
 app.set('view engine', 'ejs');
@@ -28,7 +29,14 @@ app.use(flash());
 app.use(controllers.locals)
 app.get("/", controllers.isAuth, controllers.index);
 app.get("/open-status", controllers.isAuth, controllers.businessStatus);
-app.get("/dashboard", controllers.isAuth, controllers.renderDashboard);
+app.get("/get-open-status", controllers.getBusinessStatus);
+app.get("/foods-dashboard", controllers.isAuth, controllers.renderFoodsDashboard);
+app.get("/orders-dashboard", controllers.isAuth, controllers.renderOrdersDashboard);
+
+
+app.route("/view-order/:id")
+	.get(controllers.isAuth, controllers.renderViewOrder)
+	.post(controllers.isAuth, controllers.updateOrder);
 
 
 app.route("/sign-in")
